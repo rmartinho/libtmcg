@@ -93,8 +93,9 @@ int main
 	mpz_t a, b, aa, bb;
 	assert(init_libTMCG());
 	
-	size_t pi_check_factor = 256;
-	size_t pi_check_n = 3, pi_check_size = 6 * pi_check_factor, cnt = 0;
+	const size_t pi_check_factor = 256;
+	const size_t pi_check_n = 3, pi_check_size = 6 * pi_check_factor;
+    size_t cnt = 0;
 	std::vector<size_t> delta, alpha[pi_check_size], beta[pi_check_size];
 	for (size_t i = 0; i < pi_check_n; i++)
 		delta.push_back(i);
