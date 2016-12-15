@@ -1,0 +1,291 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to enable the forking tests */
+#undef FORKING
+
+/* Define to 1 if you have the <algorithm> header file. */
+#undef HAVE_ALGORITHM
+
+/* Define to 1 if you have the <assert.h> header file. */
+#undef HAVE_ASSERT_H
+
+/* Define to 1 if you have the <cassert> header file. */
+#undef HAVE_CASSERT
+
+/* Define to 1 if you have the `clock' function. */
+#undef HAVE_CLOCK
+
+/* Define to 1 if you have the `close' function. */
+#undef HAVE_CLOSE
+
+/* Define to 1 if you have the <cstdarg> header file. */
+#undef HAVE_CSTDARG
+
+/* Define to 1 if you have the <cstdio> header file. */
+#undef HAVE_CSTDIO
+
+/* Define to 1 if you have the <cstdlib> header file. */
+#undef HAVE_CSTDLIB
+
+/* Define to 1 if you have the <cstring> header file. */
+#undef HAVE_CSTRING
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <errno.h> header file. */
+#undef HAVE_ERRNO_H
+
+/* Define to 1 if you have the `fork' function. */
+#undef HAVE_FORK
+
+/* Define to 1 if you have the `fprintf' function. */
+#undef HAVE_FPRINTF
+
+/* Define to 1 if you have the <functional> header file. */
+#undef HAVE_FUNCTIONAL
+
+/* Define to 1 if you have the <gcrypt.h> header file. */
+#undef HAVE_GCRYPT_H
+
+/* Define to 1 if you have the <gmp.h> header file. */
+#undef HAVE_GMP_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <iostream> header file. */
+#undef HAVE_IOSTREAM
+
+/* Define to 1 if you have the `gmp' library (-lgmp). */
+#undef HAVE_LIBGMP
+
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
+/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
+   to 0 otherwise. */
+#undef HAVE_MALLOC
+
+/* Define to 1 if you have the <map> header file. */
+#undef HAVE_MAP
+
+/* Define to 1 if you have the `memcmp' function. */
+#undef HAVE_MEMCMP
+
+/* Define to 1 if you have the `memcpy' function. */
+#undef HAVE_MEMCPY
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `memset' function. */
+#undef HAVE_MEMSET
+
+/* Define to 1 if you have the `pipe' function. */
+#undef HAVE_PIPE
+
+/* Define to 1 if you have the `snprintf' function. */
+#undef HAVE_SNPRINTF
+
+/* Define to 1 if you have the <sstream> header file. */
+#undef HAVE_SSTREAM
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <string> header file. */
+#undef HAVE_STRING
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strtoul' function. */
+#undef HAVE_STRTOUL
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/wait.h> header file. */
+#undef HAVE_SYS_WAIT_H
+
+/* Define to 1 if you have the <time.h> header file. */
+#undef HAVE_TIME_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <vector> header file. */
+#undef HAVE_VECTOR
+
+/* Define to 1 if you have the `vfork' function. */
+#undef HAVE_VFORK
+
+/* Define to 1 if you have the <vfork.h> header file. */
+#undef HAVE_VFORK_H
+
+/* Define to 1 if you have the `waitpid' function. */
+#undef HAVE_WAITPID
+
+/* Define to 1 if `fork' works. */
+#undef HAVE_WORKING_FORK
+
+/* Define to 1 if `vfork' works. */
+#undef HAVE_WORKING_VFORK
+
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
+#undef LT_OBJDIR
+
+/* Name of this package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Define the security parameter of the DDH-hard group G; Underlying
+   assumptions: DDH, CDH, DLOG */
+#undef TMCG_DDH_SIZE
+
+/* Define the security parameter of the shortened exponents; Underlying
+   assumptions: DLSE (related to DDH), DLOG */
+#undef TMCG_DLSE_SIZE
+
+/* Define the message digest algorithm for signatures and FS-heuristic;
+   Underlying assumption: Random Oracle Model */
+#undef TMCG_GCRY_MD_ALGO
+
+/* Define the security parameter for the soundness of the interactive argument
+   for Groth's VSSHE and SKC. */
+#undef TMCG_GROTH_L_E
+
+/* Define whether hashed commitments (short values) should be used; Underlying
+   assumption: Random Oracle Model */
+#undef TMCG_HASH_COMMITMENT
+
+/* Define the size of the unique TMCG key ID (in characters) */
+#undef TMCG_KEYID_SIZE
+
+/* Define the maximum soundness error probability of the TMCG public key; NIZK
+   proof (Gennaro, Micciancio, Rabin), Stage 1: m is square free;
+   d^{-TMCG_KEY_NIZK_STAGE1} with d = ... */
+#undef TMCG_KEY_NIZK_STAGE1
+
+/* Define the maximum soundness error probability of the TMCG public key; NIZK
+   proof (Gennaro, Micciancio, Rabin), Stage 2: m is prime power product;
+   2^{-TMCG_KEY_NIZK_STAGE2} */
+#undef TMCG_KEY_NIZK_STAGE2
+
+/* Define the maximum soundness error probability for the TMCG public key;
+   NIZK proof (Goldwasser, Micali); Stage 3: y \in NQR^\circ_m;
+   2^{-TMCG_KEY_NIZK_STAGE3} */
+#undef TMCG_KEY_NIZK_STAGE3
+
+/* Define the necessary version number of the GNU gcrypt library */
+#undef TMCG_LIBGCRYPT_VERSION
+
+/* Define the necessary version number of the GNU gmp library */
+#undef TMCG_LIBGMP_VERSION
+
+/* Define the maximum number of stackable cards */
+#undef TMCG_MAX_CARDS
+
+/* Define a helping macro */
+#undef TMCG_MAX_CARD_CHARS
+
+/* Define the maximum size of the exponent for fast exponentiation */
+#undef TMCG_MAX_FPOWM_T
+
+/* Define a helping macro */
+#undef TMCG_MAX_KEYBITS
+
+/* Define a helping macro */
+#undef TMCG_MAX_KEY_CHARS
+
+/* Define the maximum number of players in the scheme of Schindelhauer */
+#undef TMCG_MAX_PLAYERS
+
+/* Define a helping macro */
+#undef TMCG_MAX_STACK_CHARS
+
+/* Define the number of bits which represents the maximum number of different
+   card types in the scheme of Schindelhauer and the maximum size of the
+   message space in the scheme of Barnett and Smart */
+#undef TMCG_MAX_TYPEBITS
+
+/* Define a helping macro */
+#undef TMCG_MAX_VALUE_CHARS
+
+/* Define the input/ouput base encoding of the iostream operators */
+#undef TMCG_MPZ_IO_BASE
+
+/* Define the number of iterations for the Miller-Rabin primality test.
+   (maximum soundness error probability 4^{-TMCG_MR_ITERATIONS}) */
+#undef TMCG_MR_ITERATIONS
+
+/* Define the security parameter for the signature generation with Rabin/PRab
+   */
+#undef TMCG_PRAB_K0
+
+/* Define the security parameter of the TMCG public key; Underlying
+   assumptions: QRA, FACTOR */
+#undef TMCG_QRA_SIZE
+
+/* Define the security parameter for the encryption with Rabin/SAEP */
+#undef TMCG_SAEP_S0
+
+/* Version of this package */
+#undef VERSION
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
+#undef inline
+#endif
+
+/* Define to rpl_malloc if the replacement function should be used. */
+#undef malloc
+
+/* Define to `int' if <sys/types.h> does not define. */
+#undef pid_t
+
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#undef size_t
+
+/* Define as `fork' if `vfork' does not work. */
+#undef vfork

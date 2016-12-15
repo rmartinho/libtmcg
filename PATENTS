@@ -1,0 +1,66 @@
+This file contains a list of known patents which are related to used techniques
+and provided functionalities of the software. We stress that in some countries
+the free use of LibTMCG (in the spirit of the GNU GPL) may violate some claims
+of these patents and thus is prohibited by law. However, I am not a lawyer ...
+
+* EP0384475 (1990-08-29, SCHNORR CLAUS PETER)
+  Method for subscriber identification and for the generation and verification
+  of electronic signatures in a data exchange system
+
+* US4995082 (1991-02-19, SCHNORR CLAUS P)
+  Method for subscriber identification and for the generation and verification
+  of electronic signatures in a data exchange system
+
+* JP3001629 (1991-01-08, KURAUSU PEETAA SHIYUNORU)
+  METHOD FOR GENERATING AND CONFIRMING MUTUAL IDENTIFICATION AND SIGNATURE
+  OF SUBSCRIBER IN DATA EXCHANGE SYSTEM
+
+* US6077161 (2000-06-20, WISLER JAMES M)
+  Multiplayer card games having card plays to foundations
+
+* WO0173694 (2001-10-04, NEFF C ANDREW, VOTEHERE INC)
+  VERIFIABLE, SECRET SHUFFLES OF ENCRYPTED DATA, SUCH AS ELGAMAL ENCRYPTED
+  DATA FOR SECURE MULTI-AUTHORITY ELECTIONS
+
+* US2002007457 (2002-01-17, NEFF C ANDREW)
+  Verifiable, secret shuffles of encrypted data, such as elgamal encrypted
+  data for secure multi-authority elections
+
+* WO02056230 (2002-07-18, NEFF C ANDREW et al., VOTEHERE INC)
+  ELECTRONIC VOTING SYSTEM
+
+* US2002078358 (2002-06-20, NEFF C ANDREW et al.)
+  Electronic voting system
+
+* US2002103029 (2002-08-01, FINLAYSON SCOTT; MULCAHY STEPHEN; LOW MICHAEL)
+  Multiplayer gaming
+
+* EP1259024 (2002-11-20, FURUKAWA JUN, NIPPON ELECTRIC CO)
+  Certified shuffle-decrypting system, certified shuffle-decrypting method
+  and certified shuffle-decryption verifying method
+
+* JP2002344445 (2002-11-29, FURUKAWA JUN, NIPPON ELECTRIC CO)
+  SHUFFLE-DECODING SYSTEM WITH CERTIFICATION AND METHOD THEREFOR, AND
+  SHUFFLE DECODING VERIFICATION METHOD
+
+* US2002181702 (2002-12-05, FURUKAWA JUN, NIPPON ELECTRIC CO)
+  Certified shuffle-decrypting system, certified shuffle-decrypting method
+  and certified shuffle-decryption verifying method
+
+* BE1014397 (2003-10-07, LAUREYSSENS DIRK)
+  Online card game, played using physical or virtual cards via e.g.
+  computer, hand held device or television
+
+* US2005028009 (2005-02-03, NEFF C ANDREW, VOTEHERE INC)
+  Verifiable secret shuffles and their application to electronic voting
+
+* WO2005093671 (2005-10-06, SALOMONSEN GORM, GROTH JENS, CRYPTOMATHIC AS)
+  ELECTRONIC VOTING SYSTEMS
+
+? Electronic Card Games in general:
+  http://v3.espacenet.com/results?sf=a&FIRST=1&CY=ep&LG=en&DB=EPODOC&TI=electronic+and+card+and+games&AB=&PN=&AP=&PR=&PD=&PA=&IN=&EC=&IC=&=&=&=&=&=
+
+? Electronic Voting in general:
+  http://v3.espacenet.com/results?sf=a&FIRST=1&CY=ep&LG=en&DB=EPODOC&TI=&AB=electronic+voting&PN=&AP=&PR=&PD=&PA=&IN=&EC=&IC=&=&=&=&=&=
+
+Finally, I want to say I am disappointed but I have not lost either hope.
