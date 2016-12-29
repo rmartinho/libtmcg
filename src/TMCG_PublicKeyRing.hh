@@ -38,7 +38,6 @@ struct TMCG_PublicKeyRing
 		(size_t n):
 			keys(n)
 	{
-		assert(n > 0);
 	}
 	
 	~TMCG_PublicKeyRing
