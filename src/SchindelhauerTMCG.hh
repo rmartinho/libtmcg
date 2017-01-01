@@ -201,12 +201,42 @@ class SchindelhauerTMCG
 		bool TMCG_VerifyMaskCard
 			(const VTMF_Card &c, const VTMF_Card &cc, BarnettSmartVTMF_dlog *vtmf,
 			std::istream &in, std::ostream &out);
+
+        bool TMCG_ProveCardSecret_IsQuadratic
+            (const TMCG_Card &c, const TMCG_SecretKey &key, size_t index, size_t w);
+        void TMCG_ProveQuadraticResidue_Root
+            (const TMCG_SecretKey &key, mpz_srcptr t, mpz_ptr t_sqrt);
+        void TMCG_ProveQuadraticResidue_Commit
+            (const TMCG_SecretKey &key, mpz_srcptr t, mpz_srcptr t_sqrt,
+            mpz_ptr R, mpz_ptr S, mpz_ptr r, mpz_ptr s);
+        mpz_srcptr TMCG_ProveQuadraticResidue_Proof
+            (mpz_srcptr challenge, mpz_srcptr r, mpz_srcptr s);
+        void TMCG_ProveNonQuadraticResidue_Prefix
+            (const TMCG_SecretKey &key, mpz_srcptr t, mpz_ptr prefix);
+
 		void TMCG_ProveCardSecret
 			(const TMCG_Card &c, const TMCG_SecretKey &key, size_t index,
 			std::istream &in, std::ostream &out);
 		void TMCG_ProveCardSecret
 			(const VTMF_Card &c, BarnettSmartVTMF_dlog *vtmf,
 			std::istream &in, std::ostream &out);
+
+        bool TMCG_VerifyCardSecret_Quadratic
+            (TMCG_CardSecret &cs, size_t index, size_t w, mpz_srcptr bit);
+        bool TMCG_VerifyNonQuadraticResidue_Congruent
+            (const TMCG_PublicKey &key, mpz_srcptr t, mpz_srcptr prefix);
+        bool TMCG_VerifyQuadraticResidue_Jacobi
+            (const TMCG_PublicKey &key, mpz_srcptr t);
+        bool TMCG_VerifyQuadraticResidue_Congruent
+            (const TMCG_PublicKey &key, mpz_srcptr t,
+            mpz_srcptr R, mpz_srcptr S);
+        void TMCG_VerifyQuadraticResidue_Challenge
+            (mpz_ptr challenge);
+        bool TMCG_VerifyQuadraticResidue_Proof
+            (const TMCG_PublicKey &key,
+            mpz_srcptr R, mpz_srcptr S,
+            mpz_srcptr challenge, mpz_srcptr proof);
+
 		bool TMCG_VerifyCardSecret
 			(const TMCG_Card &c, TMCG_CardSecret &cs, const TMCG_PublicKey &key,
 			size_t index, std::istream &in, std::ostream &out);
@@ -238,6 +268,19 @@ class SchindelhauerTMCG
 			(const TMCG_Stack<VTMF_Card> &s, TMCG_Stack<VTMF_Card> &s2,
 			const TMCG_StackSecret<VTMF_CardSecret> &ss,
 			BarnettSmartVTMF_dlog *vtmf, bool TimingAttackProtection = true);
+
+        TMCG_Stack<TMCG_Card> TMCG_ProveStackEquality_Commit
+            (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2,
+            TMCG_StackSecret<TMCG_CardSecret>& ss2, bool cyclic,
+            const TMCG_PublicKeyRing &ring, size_t index);
+        void TMCG_ProveStackEquality_CommitHash
+            (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2,
+            TMCG_StackSecret<TMCG_CardSecret>& ss2, bool cyclic,
+            const TMCG_PublicKeyRing &ring, size_t index, mpz_ptr res);
+        void TMCG_ProveStackEquality_Proof
+            (const TMCG_StackSecret<TMCG_CardSecret> &ss, TMCG_StackSecret<TMCG_CardSecret> &ss2,
+            const TMCG_PublicKeyRing &ring, mpz_srcptr question);
+
 		void TMCG_ProveStackEquality
 			(const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2,
 			const TMCG_StackSecret<TMCG_CardSecret> &ss, bool cyclic,
@@ -257,6 +300,18 @@ class SchindelhauerTMCG
 			const TMCG_StackSecret<VTMF_CardSecret> &ss,
 			BarnettSmartVTMF_dlog *vtmf, HooghSchoenmakersSkoricVillegasVRHE *vrhe,
 			std::istream &in, std::ostream &out);
+
+        void TMCG_VerifyStackEquality_Challenge
+            (mpz_ptr challenge);
+        bool TMCG_VerifyStackEquality_VerifyHash
+            (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2, mpz_srcptr hash,
+            const TMCG_StackSecret<TMCG_CardSecret> &proof,
+            bool cyclic, const TMCG_PublicKeyRing &ring, mpz_srcptr challenge);
+        bool TMCG_VerifyStackEquality_Verify
+            (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2, const TMCG_Stack<TMCG_Card> &s3,
+            const TMCG_StackSecret<TMCG_CardSecret> &proof,
+            bool cyclic, const TMCG_PublicKeyRing &ring, mpz_srcptr challenge);
+
 		bool TMCG_VerifyStackEquality
 			(const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2, 
 			bool cyclic, const TMCG_PublicKeyRing &ring, 

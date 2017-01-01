@@ -462,7 +462,7 @@ void mpz_lprime
 	 unsigned long int mr_iterations)
 {
 	mpz_t foo;
-	unsigned long int cnt = 0;
+	//unsigned long int cnt = 0;
 	
 	assert(psize > qsize);
 	
@@ -502,7 +502,7 @@ void mpz_lprime
 void mpz_oprime
 	(mpz_ptr p, unsigned long int psize, unsigned long int mr_iterations)
 {
-	unsigned long int cnt = 0;
+	//unsigned long int cnt = 0;
 	
 	/* Choose randomly an odd number $p$ of appropriate size. */
 	do

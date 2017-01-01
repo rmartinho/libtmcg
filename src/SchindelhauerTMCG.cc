@@ -43,6 +43,70 @@ SchindelhauerTMCG::SchindelhauerTMCG
 		mpz_init_set_ui(message_space[i], 0L); // values are set later
 }
 
+void SchindelhauerTMCG::TMCG_ProveQuadraticResidue_Root
+	(const TMCG_SecretKey &key, mpz_srcptr t, mpz_ptr t_sqrt)
+{
+	assert(mpz_qrmn_p(t, key.p, key.q, key.m));
+	mpz_sqrtmn_fast(t_sqrt, t, key.p, key.q, key.m,
+		key.gcdext_up, key.gcdext_vq, key.pa1d4, key.qa1d4);
+}
+
+void SchindelhauerTMCG::TMCG_ProveQuadraticResidue_Commit
+	(const TMCG_SecretKey &key, mpz_srcptr t, mpz_srcptr t_sqrt,
+    mpz_ptr R, mpz_ptr S, mpz_ptr r, mpz_ptr s)
+{
+	mpz_t lej;
+	mpz_init(lej);
+
+    // choose uniformly at random a number $r \in Z^*_m$
+    do
+    {
+        mpz_srandomm(r, key.m);
+        mpz_gcd(lej, r, key.m);
+    }
+    while (mpz_cmp_ui(lej, 1L) || !mpz_cmp_ui(r, 1L));
+    
+    // compute $s := t_sqrt \cdot r_i^{-1} \bmod m$
+    ret = mpz_invert(s, r, key.m);
+    assert(ret);
+    mpz_mul(s, s, t_sqrt);
+    mpz_mod(s, s, key.m);
+    assert(mpz_cmp_ui(s, 1L));
+    
+    // compute $R_i = r_i^2 \bmod m,\; S_i = s_i^2 \bmod m$
+    mpz_mul(R, r, r);
+    mpz_mod(R, R, key.m);
+    mpz_mul(S, s, s);
+    mpz_mod(S, S, key.m);
+    
+    // check the congruence $R_i \cdot S_i \equiv t \pmod{m}$
+    #ifndef NDEBUG
+        mpz_mul(lej, R, S);
+        mpz_mod(lej, lej, key.m);
+        assert(mpz_congruent_p(t, lej, key.m));
+    #endif
+
+    mpz_clear(lej);
+}
+
+mpz_srcptr SchindelhauerTMCG::TMCG_ProveQuadraticResidue_Proof
+    (mpz_srcptr challenge, mpz_srcptr r, mpz_srcptr s)
+{
+    // send proof to the verifier
+    if (mpz_get_ui(challenge) & 1L)
+        return r;
+    else
+        return s;
+}
+
+void SchindelhauerTMCG::TMCG_ProveNonQuadraticResidue_Prefix
+	(const TMCG_SecretKey &key, mpz_srcptr t, mpz_ptr prefix)
+{
+	mpz_set(prefix, t);
+	mpz_mul(prefix, prefix, key.y1);
+	mpz_mod(prefix, prefix, key.m);
+}
+
 void SchindelhauerTMCG::TMCG_ProveQuadraticResidue
 	(const TMCG_SecretKey &key, mpz_srcptr t,
 		std::istream &in, std::ostream &out)
@@ -55,9 +119,7 @@ void SchindelhauerTMCG::TMCG_ProveQuadraticResidue
 	mpz_init(foo), mpz_init(bar), mpz_init(lej), mpz_init(t_sqrt);
 	
 	// compute mpz_sqrtmn (modular square root) of t
-	assert(mpz_qrmn_p(t, key.p, key.q, key.m));
-	mpz_sqrtmn_fast(t_sqrt, t, key.p, key.q, key.m,
-		key.gcdext_up, key.gcdext_vq, key.pa1d4, key.qa1d4);
+    TMCG_ProveQuadraticResidue_Root(key, t, t_sqrt);
 	
 	// phase (P2)
 	for (unsigned long int i = 0; i < security_desire; i++)
@@ -65,33 +127,7 @@ void SchindelhauerTMCG::TMCG_ProveQuadraticResidue
 		mpz_ptr r = new mpz_t(), s = new mpz_t();
 		mpz_init(r), mpz_init(s);
 		
-		// choose uniformly at random a number $r \in Z^*_m$
-		do
-		{
-			mpz_srandomm(r, key.m);
-			mpz_gcd(lej, r, key.m);
-		}
-		while (mpz_cmp_ui(lej, 1L) || !mpz_cmp_ui(r, 1L));
-		
-		// compute $s := t_sqrt \cdot r_i^{-1} \bmod m$
-		ret = mpz_invert(s, r, key.m);
-		assert(ret);
-		mpz_mul(s, s, t_sqrt);
-		mpz_mod(s, s, key.m);
-		assert(mpz_cmp_ui(s, 1L));
-		
-		// compute $R_i = r_i^2 \bmod m,\; S_i = s_i^2 \bmod m$
-		mpz_mul(foo, r, r);
-		mpz_mod(foo, foo, key.m);
-		mpz_mul(bar, s, s);
-		mpz_mod(bar, bar, key.m);
-		
-		// check the congruence $R_i \cdot S_i \equiv t \pmod{m}$
-		#ifndef NDEBUG
-			mpz_mul(lej, foo, bar);
-			mpz_mod(lej, lej, key.m);
-			assert(mpz_congruent_p(t, lej, key.m));
-		#endif
+        TMCG_ProveQuadraticResidue_Commit(key, t, t_sqrt, foo, bar, r, s);
 		
 		// store $r_i$, $s_i$ and send $R_i$, $S_i$ to the verifier
 		rr.push_back(r), ss.push_back(s);
@@ -105,10 +141,7 @@ void SchindelhauerTMCG::TMCG_ProveQuadraticResidue
 		in >> foo;
 		
 		// send proof to the verifier
-		if (mpz_get_ui(foo) & 1L)
-			out << rr[i] << std::endl;
-		else
-			out << ss[i] << std::endl;
+        out << TMCG_ProveQuadraticResidue_Proof(foo, rr[i], ss[i]) << std::endl;
 	}
 	
 	mpz_clear(foo), mpz_clear(bar), mpz_clear(lej), mpz_clear(t_sqrt);
@@ -118,18 +151,64 @@ void SchindelhauerTMCG::TMCG_ProveQuadraticResidue
 		mpz_clear(*si), delete *si;
 }
 
+bool SchindelhauerTMCG::TMCG_VerifyQuadraticResidue_Jacobi
+	(const TMCG_PublicKey &key, mpz_srcptr t)
+{
+	return mpz_jacobi(t, key.m) == 1;
+}
+
+bool SchindelhauerTMCG::TMCG_VerifyQuadraticResidue_Congruent
+	(const TMCG_PublicKey &key, mpz_srcptr t,
+    mpz_srcptr R, mpz_srcptr S)
+{
+	mpz_t foo;
+	mpz_init(foo);
+
+    mpz_mul(foo, S, R);
+    mpz_mod(foo, foo, key.m);
+    bool result = mpz_congruent_p(t, foo, key.m);
+	mpz_clear(foo);
+    return result;
+}
+
+void SchindelhauerTMCG::TMCG_VerifyQuadraticResidue_Challenge
+	(mpz_ptr challenge)
+{
+    mpz_srandomb(challenge, 1L);
+}
+
+bool SchindelhauerTMCG::TMCG_VerifyQuadraticResidue_Proof
+	(const TMCG_PublicKey &key,
+    mpz_srcptr R, mpz_srcptr S,
+    mpz_srcptr challenge, mpz_srcptr proof)
+{
+	mpz_t lej;
+    mpz_init(lej);
+
+    mpz_mul(lej, proof, proof);
+    mpz_mod(lej, lej, key.m);
+    
+    bool result = !(((mpz_get_ui(challenge) & 1L) && 
+        (mpz_cmp(lej, R) || !mpz_cmp_ui(proof, 1L))) ||
+        (!(mpz_get_ui(challenge) & 1L) && 
+        (mpz_cmp(lej, S) || !mpz_cmp_ui(proof, 1L))));
+
+    mpz_clear(lej);
+    return result;
+}
+
 bool SchindelhauerTMCG::TMCG_VerifyQuadraticResidue
 	(const TMCG_PublicKey &key, mpz_srcptr t, std::istream &in, std::ostream &out)
 {
 	std::vector<mpz_ptr> RR, SS;
-	mpz_t foo, bar, lej;
+	mpz_t foo, bar;
 	out << TMCG_SecurityLevel << std::endl;
 	
 	// check whether $t \in Z^\circ_m$
-	if (mpz_jacobi(t, key.m) != 1)
+	if (!TMCG_VerifyQuadraticResidue_Jacobi(key, t))
 		return false;
 	
-	mpz_init(foo), mpz_init(bar), mpz_init(lej);
+	mpz_init(foo), mpz_init(bar);
 	try
 	{
 		// phase (V3)
@@ -143,31 +222,23 @@ bool SchindelhauerTMCG::TMCG_VerifyQuadraticResidue
 			RR.push_back(R), SS.push_back(S);
 			
 			// check the congruence $R_i \cdot S_i \equiv t \pmod{m}$
-			mpz_mul(foo, S, R);
-			mpz_mod(foo, foo, key.m);
-			if (!mpz_congruent_p(t, foo, key.m))
-				throw false;
+            if (!TMCG_VerifyQuadraticResidue_Congruent(key, t, R, S))
+                throw false;
 		}
 		
 		// phase (V4)
 		for (unsigned long int i = 0; i < TMCG_SecurityLevel; i++)
 		{
 			// send R/S-question to the prover
-			mpz_srandomb(foo, 1L);
+			TMCG_VerifyQuadraticResidue_Challenge(foo);
 			out << foo << std::endl;
 			
 			// receive the proof
 			in >> bar;
 			
 			// verify either $R_i\equiv r_i^2\pmod{m}$ or $S_i\equiv s_i^2\pmod{m}$
-			mpz_mul(lej, bar, bar);
-			mpz_mod(lej, lej, key.m);
-			
-			if (((mpz_get_ui(foo) & 1L) && 
-				(mpz_cmp(lej, RR[i]) || !mpz_cmp_ui(bar, 1L))) ||
-				(!(mpz_get_ui(foo) & 1L) && 
-				(mpz_cmp(lej, SS[i]) || !mpz_cmp_ui(bar, 1L))))
-					throw false;
+            if (!TMCG_VerifyQuadraticResidue_Proof(key, RR[i], SS[i], foo, bar))
+                throw false;
 		}
 		
 		// finish
@@ -175,7 +246,7 @@ bool SchindelhauerTMCG::TMCG_VerifyQuadraticResidue
 	}
 	catch (bool return_value)
 	{
-		mpz_clear(foo), mpz_clear(bar), mpz_clear(lej);
+		mpz_clear(foo), mpz_clear(bar);
 		for (std::vector<mpz_ptr>::iterator ri = RR.begin(); ri != RR.end(); ri++)
 			mpz_clear(*ri), delete *ri;
 		for (std::vector<mpz_ptr>::iterator si = SS.begin(); si != SS.end(); si++)
@@ -191,9 +262,7 @@ void SchindelhauerTMCG::TMCG_ProveNonQuadraticResidue
 	mpz_init(bar);
 	
 	// compute bar = t * y^{-1} (mod m) and send it to verifier
-	mpz_set(bar, t);
-	mpz_mul(bar, bar, key.y1);
-	mpz_mod(bar, bar, key.m);
+    TMCG_ProveNonQuadraticResidue_Prefix(key, t, bar);
 	out << bar << std::endl;
 	
 	// QR-proof
@@ -203,21 +272,32 @@ void SchindelhauerTMCG::TMCG_ProveNonQuadraticResidue
 	return;
 }
 
+bool SchindelhauerTMCG::TMCG_VerifyNonQuadraticResidue_Congruent
+	(const TMCG_PublicKey &key, mpz_srcptr t, mpz_srcptr prefix)
+{
+	mpz_t foo;
+    mpz_init(foo);
+
+    mpz_mul(foo, prefix, key.y);
+    mpz_mod(foo, foo, key.m); 
+    bool result = mpz_congruent_p(t, foo, key.m);
+    mpz_clear(foo);
+    return result;
+}
+
 bool SchindelhauerTMCG::TMCG_VerifyNonQuadraticResidue
 	(const TMCG_PublicKey &key, mpz_srcptr t, std::istream &in, std::ostream &out)
 {
-	mpz_t foo, bar;
+	mpz_t bar;
 	
-	mpz_init(foo), mpz_init(bar);
+	mpz_init(bar);
 	try
 	{
 		// receive bar from prover
 		in >> bar;
 		
 		// check congruence bar * y \cong t (mod m)
-		mpz_mul(foo, bar, key.y);
-		mpz_mod(foo, foo, key.m); 
-		if (!mpz_congruent_p(t, foo, key.m))
+		if (!TMCG_VerifyNonQuadraticResidue_Congruent(key, t, bar))
 			throw false;
 		
 		// verify QR-proof
@@ -229,7 +309,7 @@ bool SchindelhauerTMCG::TMCG_VerifyNonQuadraticResidue
 	}
 	catch (bool return_value)
 	{
-		mpz_clear(foo), mpz_clear(bar);
+		mpz_clear(bar);
 		return return_value;
 	}
 }
@@ -976,6 +1056,12 @@ bool SchindelhauerTMCG::TMCG_VerifyPrivateCard
 	return true;
 }
 
+bool SchindelhauerTMCG::TMCG_ProveCardSecret_IsQuadratic
+	(const TMCG_Card &c, const TMCG_SecretKey &key, size_t index, size_t w)
+{
+	return mpz_qrmn_p(&c.z[index][w], key.p, key.q, key.m);
+}
+
 void SchindelhauerTMCG::TMCG_ProveCardSecret
 	(const TMCG_Card &c, const TMCG_SecretKey &key, size_t index,
 		std::istream &in, std::ostream &out)
@@ -986,7 +1072,7 @@ void SchindelhauerTMCG::TMCG_ProveCardSecret
 	
 	for (size_t w = 0; w < c.z[0].size(); w++)
 	{
-		if (mpz_qrmn_p(&c.z[index][w], key.p, key.q, key.m))
+		if (TMCG_ProveCardSecret_IsQuadratic(c, key, index, w))
 		{
 			out << "0" << std::endl;
 			TMCG_ProveQuadraticResidue(key, &c.z[index][w], in, out);
@@ -1006,6 +1092,14 @@ void SchindelhauerTMCG::TMCG_ProveCardSecret
 	vtmf->VerifiableDecryptionProtocol_Prove(c.c_1, out);
 }
 
+bool SchindelhauerTMCG::TMCG_VerifyCardSecret_Quadratic
+	(TMCG_CardSecret &cs, size_t index, size_t w, mpz_srcptr bit)
+{
+    mpz_set(&cs.b[index][w], bit);
+    mpz_set_ui(&cs.r[index][w], 0L);
+    return mpz_get_ui(&cs.b[index][w]) & 1L;
+}
+
 bool SchindelhauerTMCG::TMCG_VerifyCardSecret
 	(const TMCG_Card &c, TMCG_CardSecret &cs, const TMCG_PublicKey &key,
 	size_t index, std::istream &in, std::ostream &out)
@@ -1015,13 +1109,14 @@ bool SchindelhauerTMCG::TMCG_VerifyCardSecret
 	assert((c.z.size() == cs.r.size()) && (c.z[0].size() == cs.r[0].size()));
 	assert(c.z.size() > index);
 	
+    mpz_t foo;
+    mpz_init(foo);
 	try
 	{
 		for (size_t w = 0; w < c.z[0].size(); w++)
 		{
-			in >> &cs.b[index][w];
-			mpz_set_ui(&cs.r[index][w], 0L);
-			if (mpz_get_ui(&cs.b[index][w]) & 1L)
+			in >> foo;
+            if(TMCG_VerifyCardSecret_Quadratic(cs, index, w, foo))
 			{
 				if (!TMCG_VerifyNonQuadraticResidue(key, &c.z[index][w], in, out))
 					throw false;
@@ -1038,6 +1133,7 @@ bool SchindelhauerTMCG::TMCG_VerifyCardSecret
 	}
 	catch (bool return_value)
 	{
+        mpz_clear(foo);
 		return return_value;
 	}
 }
@@ -1328,6 +1424,45 @@ void SchindelhauerTMCG::TMCG_GlueStackSecret
 		pi.push(ss3[i].first, ss3[i].second);
 }
 
+TMCG_Stack<TMCG_Card> SchindelhauerTMCG::TMCG_ProveStackEquality_Commit
+    (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2,
+    TMCG_StackSecret<TMCG_CardSecret>& ss2, bool cyclic,
+    const TMCG_PublicKeyRing &ring, size_t index)
+{
+    TMCG_Stack<TMCG_Card> s3;
+
+    // create and mix the stack
+    TMCG_CreateStackSecret(ss2, cyclic, ring, index, s.size());
+    TMCG_MixStack(s2, s3, ss2, ring);
+
+    return s3;
+}
+
+void SchindelhauerTMCG::TMCG_ProveStackEquality_CommitHash
+    (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2,
+    TMCG_StackSecret<TMCG_CardSecret>& ss2, bool cyclic,
+    const TMCG_PublicKeyRing &ring, size_t index, mpz_ptr res)
+{
+    TMCG_Stack<TMCG_Card> s3;
+    
+    // create and mix the stack
+    TMCG_CreateStackSecret(ss2, cyclic, ring, index, s.size());
+    TMCG_MixStack(s2, s3, ss2, ring);
+    
+    // send only the hash value (instead of the whole stack)
+    std::ostringstream ost;
+    ost << s3 << std::endl;
+    mpz_shash(res, ost.str());
+}
+
+void SchindelhauerTMCG::TMCG_ProveStackEquality_Proof
+    (const TMCG_StackSecret<TMCG_CardSecret> &ss, TMCG_StackSecret<TMCG_CardSecret> &ss2,
+    const TMCG_PublicKeyRing &ring, mpz_srcptr question)
+{
+    if (!(mpz_get_ui(question) & 1L))
+        TMCG_GlueStackSecret(ss, ss2, ring);
+}
+
 void SchindelhauerTMCG::TMCG_ProveStackEquality
 	(const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2,
 	const TMCG_StackSecret<TMCG_CardSecret> &ss, bool cyclic,
@@ -1344,24 +1479,18 @@ void SchindelhauerTMCG::TMCG_ProveStackEquality
 	mpz_init(foo);
 	for (unsigned long int i = 0; i < security_desire; i++)
 	{
-		TMCG_Stack<TMCG_Card> s3;
 		TMCG_StackSecret<TMCG_CardSecret> ss2;
-		
-		// create and mix the stack
-		TMCG_CreateStackSecret(ss2, cyclic, ring, index, s.size());
-		TMCG_MixStack(s2, s3, ss2, ring);
 		
 		if (TMCG_HASH_COMMITMENT)
 		{
 			// send only the hash value (instead of the whole stack)
-			std::ostringstream ost;
-			ost << s3 << std::endl;
-			mpz_shash(foo, ost.str());
+            TMCG_ProveStackEquality_CommitHash(s, s2, ss2, cyclic, ring, index, foo);
 			out << foo << std::endl;
 		}
 		else
 		{
 			// send the whole stack (commitment)
+            TMCG_Stack<TMCG_Card> s3 = TMCG_ProveStackEquality_Commit(s, s2, ss2, cyclic, ring, index);
 			out << s3 << std::endl;
 		}
 		
@@ -1570,6 +1699,71 @@ void SchindelhauerTMCG::TMCG_ProveStackEquality_Hoogh
 	TMCG_ReleaseStackEquality_Hoogh(R, e, E);
 }
 
+void SchindelhauerTMCG::TMCG_VerifyStackEquality_Challenge
+    (mpz_ptr challenge)
+{
+    mpz_srandomb(challenge, 1L);
+}
+bool SchindelhauerTMCG::TMCG_VerifyStackEquality_VerifyHash
+    (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2, mpz_srcptr hash,
+    const TMCG_StackSecret<TMCG_CardSecret> &proof,
+    bool cyclic, const TMCG_PublicKeyRing &ring, mpz_srcptr challenge)
+{
+    TMCG_Stack<TMCG_Card> s4;
+
+    if (mpz_get_ui(challenge) & 1L)
+        TMCG_MixStack(s2, s4, proof, ring, false);
+    else
+        TMCG_MixStack(s, s4, proof, ring, false);
+
+    mpz_t foo;
+    mpz_init(foo);
+    std::ostringstream ost;
+    ost << s4 << std::endl;
+    mpz_shash(foo, ost.str());
+    bool differs = mpz_cmp(foo, hash);
+    mpz_clear(foo);
+    if (differs)
+        return false;
+    
+    // verify cyclic shift
+    if (cyclic)
+    {
+        size_t cyc = proof[0].first;
+        for (size_t j = 1; j < proof.size(); j++)
+            if (((++cyc) % proof.size()) != proof[j].first)
+                return false;
+    }
+
+    return true;
+}
+bool SchindelhauerTMCG::TMCG_VerifyStackEquality_Verify
+    (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2, const TMCG_Stack<TMCG_Card> &s3,
+    const TMCG_StackSecret<TMCG_CardSecret> &proof,
+    bool cyclic, const TMCG_PublicKeyRing &ring, mpz_srcptr challenge)
+{
+    TMCG_Stack<TMCG_Card> s4;
+
+    if (mpz_get_ui(challenge) & 1L)
+        TMCG_MixStack(s2, s4, proof, ring, false);
+    else
+        TMCG_MixStack(s, s4, proof, ring, false);
+
+    if (s3 != s4)
+        return false;
+    
+    // verify cyclic shift
+    if (cyclic)
+    {
+        size_t cyc = proof[0].first;
+        for (size_t j = 1; j < proof.size(); j++)
+            if (((++cyc) % proof.size()) != proof[j].first)
+                return false;
+    }
+
+    return true;
+}
+
 bool SchindelhauerTMCG::TMCG_VerifyStackEquality
 	(const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2, bool cyclic,
 	const TMCG_PublicKeyRing &ring, std::istream &in, std::ostream &out)
@@ -1588,7 +1782,8 @@ bool SchindelhauerTMCG::TMCG_VerifyStackEquality
 		{
 			TMCG_Stack<TMCG_Card> s3, s4;
 			TMCG_StackSecret<TMCG_CardSecret> ss;
-			mpz_srandomb(foo, 1L);
+
+            TMCG_VerifyStackEquality_Challenge(foo);
 			
 			if (TMCG_HASH_COMMITMENT)
 			{
@@ -1612,31 +1807,15 @@ bool SchindelhauerTMCG::TMCG_VerifyStackEquality
 				throw false;
 			
 			// verify equality proof
-			if (mpz_get_ui(foo) & 1L)
-				TMCG_MixStack(s2, s4, ss, ring, false);
-			else
-				TMCG_MixStack(s, s4, ss, ring, false);
 			if (TMCG_HASH_COMMITMENT)
 			{
-				std::ostringstream ost;
-				ost << s4 << std::endl;
-				mpz_shash(foo, ost.str());
-				if (mpz_cmp(foo, bar))
-					throw false;
+                if (!TMCG_VerifyStackEquality_VerifyHash(s, s2, bar, ss, cyclic, ring, foo))
+                    throw false;
 			}
 			else
 			{
-				if (s3 != s4)
-					throw false;
-			}
-			
-			// verify cyclic shift
-			if (cyclic)
-			{
-				size_t cyc = ss[0].first;
-				for (size_t j = 1; j < ss.size(); j++)
-					if (((++cyc) % ss.size()) != ss[j].first)
-						throw false;
+                if (!TMCG_VerifyStackEquality_Verify(s, s2, s3, ss, cyclic, ring, foo))
+                    throw false;
 			}
 		}
 		

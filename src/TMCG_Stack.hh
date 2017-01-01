@@ -71,7 +71,7 @@ template <typename CardType> struct TMCG_Stack
 	/** This operator tests two stacks for equality of their cards
 	    and sizes. */
 	bool operator ==
-		(const TMCG_Stack<CardType>& that)
+		(const TMCG_Stack<CardType>& that) const
 	{
 		if (stack.size() != that.stack.size())
 			return false;
@@ -81,7 +81,7 @@ template <typename CardType> struct TMCG_Stack
 	/** This operator tests two stacks for inequality of their cards
 	    or sizes. */
 	bool operator !=
-		(const TMCG_Stack<CardType>& that)
+		(const TMCG_Stack<CardType>& that) const
 	{
 		return !(*this == that);
 	}
