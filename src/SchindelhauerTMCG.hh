@@ -269,10 +269,10 @@ class SchindelhauerTMCG
 			const TMCG_StackSecret<VTMF_CardSecret> &ss,
 			BarnettSmartVTMF_dlog *vtmf, bool TimingAttackProtection = true);
 
-        TMCG_Stack<TMCG_Card> TMCG_ProveStackEquality_Commit
+        void TMCG_ProveStackEquality_Commit
             (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2,
-            TMCG_StackSecret<TMCG_CardSecret>& ss2, bool cyclic,
-            const TMCG_PublicKeyRing &ring, size_t index);
+            TMCG_Stack<TMCG_Card> &s3, TMCG_StackSecret<TMCG_CardSecret>& ss2,
+            bool cyclic, const TMCG_PublicKeyRing &ring, size_t index);
         void TMCG_ProveStackEquality_CommitHash
             (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2,
             TMCG_StackSecret<TMCG_CardSecret>& ss2, bool cyclic,

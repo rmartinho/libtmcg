@@ -1424,18 +1424,14 @@ void SchindelhauerTMCG::TMCG_GlueStackSecret
 		pi.push(ss3[i].first, ss3[i].second);
 }
 
-TMCG_Stack<TMCG_Card> SchindelhauerTMCG::TMCG_ProveStackEquality_Commit
+void SchindelhauerTMCG::TMCG_ProveStackEquality_Commit
     (const TMCG_Stack<TMCG_Card> &s, const TMCG_Stack<TMCG_Card> &s2,
-    TMCG_StackSecret<TMCG_CardSecret>& ss2, bool cyclic,
-    const TMCG_PublicKeyRing &ring, size_t index)
+    TMCG_Stack<TMCG_Card> &s3, TMCG_StackSecret<TMCG_CardSecret>& ss2,
+    bool cyclic, const TMCG_PublicKeyRing &ring, size_t index)
 {
-    TMCG_Stack<TMCG_Card> s3;
-
     // create and mix the stack
     TMCG_CreateStackSecret(ss2, cyclic, ring, index, s.size());
     TMCG_MixStack(s2, s3, ss2, ring);
-
-    return s3;
 }
 
 void SchindelhauerTMCG::TMCG_ProveStackEquality_CommitHash
@@ -1490,7 +1486,8 @@ void SchindelhauerTMCG::TMCG_ProveStackEquality
 		else
 		{
 			// send the whole stack (commitment)
-            TMCG_Stack<TMCG_Card> s3 = TMCG_ProveStackEquality_Commit(s, s2, ss2, cyclic, ring, index);
+            TMCG_Stack<TMCG_Card> s3;
+            TMCG_ProveStackEquality_Commit(s, s2, s3, ss2, cyclic, ring, index);
 			out << s3 << std::endl;
 		}
 		
